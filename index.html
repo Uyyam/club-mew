@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- 
+      This is an HTML comment
+      You can write text in a comment and the content won't be visible in the page
+    -->
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+    
+    
+    
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+    <!--
+      This is the page head - it contains info the browser uses
+      Like the title, which appears on the browser tab but not inside the page
+      Further down you'll see the content that displays in the page
+    -->
+    <title>Club Mew</title>
+
+    <!-- The website stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Welcome to my club :3</h1>
+    <h2>click to listen to da musik :P</h2>
+
+    <img src="images/dancingcat1.gif" class="dancing" style="  top:70%;left:10%;">
+    <img src="images/dancingcat2.gif" class="dancing" style="top:20%; left: 80%";>
+    <img src="images/dancingcat3.gif" class="dancing" style="top:80%; left:80%">
+    <img src="images/dancingcat4.gif" width="150px" class="dancing" style="top:10%; left:10%">
+
+    <img src="images/coughcat.gif" class="dancing" style="top:-5%; left:60%">
+    <img src="images/spin.gif" width="150px" class="dancing" style="top:0%; left:30%">
+
+    <div id="left-side">
+  <div class="light c1"></div>
+<div class="light c2"></div>
+<div class="light c3"></div>
+<div class="light c4"></div>
+  <div class="light c1"></div>
+<div class="light c2"></div>
+<div class="light c3"></div>
+<div class="light c4"></div>
+  <div class="light c1"></div>
+<div class="light c2"></div>
+<div class="light c3"></div>
+<div class="light c4"></div>
+</div>
+      <div id="sketch-holder">
+
+      <!-- Our sketch will go here! -->
+    </div>
+
+    <audio autoplay muted loop id="music-player" can-play>
+  <source src="MAMA.mp3" type="audio/mp3">
+</audio>
+
+<div id="right-side">
+   <div class="light c1"></div>
+<div class="light c2"></div>
+<div class="light c3"></div>
+<div class="light c4"></div>
+  <div class="light c1"></div>
+<div class="light c2"></div>
+<div class="light c3"></div>
+<div class="light c4"></div>
+  <div class="light c1"></div>
+<div class="light c2"></div>
+<div class="light c3"></div>
+<div class="light c4"></div>
+</div>
+
+
+
+  </body>
+      <script type="module">
+      import { playhtml } from "https://unpkg.com/playhtml@latest";
+      
+    const musicPlayer = document.getElementById("music-player");
+musicPlayer.defaultData = {
+  startedAt: Date.now() - musicPlayer.currentTime * 1000,
+};
+
+const DRIFT_THRESHOLD = 0.25; // seconds, only correct if off by more than this
+
+musicPlayer.updateElement = ({ element, data }) => {
+  element.muted = true;
+  element.volume = 0.2;
+
+  if (!data || typeof data.startedAt !== "number" || !isFinite(data.startedAt)) {
+    return;
+  }
+
+  const expected = (Date.now() - data.startedAt) / 1000;
+  if (!isFinite(expected) || expected < 0) {
+    return;
+  }
+
+  if (element.readyState < 1) {
+    element.addEventListener("loadedmetadata", () => {
+      if (isFinite(expected)) element.currentTime = expected;
+    }, { once: true });
+    return;
+  }
+
+  const drift = Math.abs(element.currentTime - expected);
+  if (drift > DRIFT_THRESHOLD) {
+    element.currentTime = expected;
+  }
+
+  if (element.paused) {
+    element.play().catch(() => {});
+  }
+};
+        document.addEventListener('click', () => {
+  musicPlayer.muted = false;
+}, { once: true });
+
+musicPlayer.onMount = ({ setData, requestUpdate }) => {
+  // Only set the reference once — don't keep resetting it every second.
+  // If you want periodic re-sync in case of clock skew, do it rarely
+  // and only correct big drift (handled above), e.g. every 10-15s:
+  const resync = setInterval(() => {
+    requestUpdate(); // just re-runs updateElement with existing data, checks drift
+  }, 5000);
+
+  return () => clearInterval(resync);
+};
+        
+const captures = {};
+
+function createUser(id){
+  if (document.getElementById(id)) return;
+  const el = document.createElement("div");
+  el.setAttribute("can-mirror", "")
+el.id = id;
+//
+document.getElementById('sketch-holder').appendChild(el);
+new p5((p) => newCapture(p, id));
+playhtml.setupPlayElement(el, { ignoreIfAlreadySetup: true });
+}
+
+function newCapture(p , id) {
+  p.setup = function () {
+  const canvas = p.createCanvas(100, 100);
+    const capture = p.createCapture(p.VIDEO, { flipped: true });
+    capture.size(100,100);
+    capture.hide();               // hide the raw video, only show the canvas
+    canvas.parent(document.getElementById(id));
+    captures[id] = capture;       // draw(
+  };
+  p.draw = function () {
+    p.image(captures[id], 0, 0, 100);
+  }
+}
+
+    
+
+      playhtml.init({
+        developmentMode: true
+      });
+
+      // Make playhtml available globally for script.js
+      window.playhtml = playhtml;
+      
+playhtml.ready.then(() => {
+          //   playhtml.presence
+          //     .getPresences()
+          //     .entries()
+          //     .forEach(([id, p]) => {
+          //   playhtml.presence.getPresences().entries().forEach(([id, p]) =>{
+          //   createUser(id);
+          //   });
+            
+          //    console.log(playhtml.presence.getMyIdentity().publicKey);
+          //   console.log(playhtml.presence.getPresences());
+          // })
+          document.addEventListener('mousemove', (event) => {
+  // Use clientX and clientY for viewport coordinates
+  document.getElementById(playhtml.presence.getMyIdentity().publicKey).style.left = `${event.clientX}px`;
+  document.getElementById(playhtml.presence.getMyIdentity().publicKey).style.top = `${event.clientY}px`;
+
+
+});
+
+playhtml.presence.onPresenceChange("playerIdentity", (presences) => {
+  const currentIds = new Set([...presences.keys()]);
+
+  // add new users
+  currentIds.forEach((id) => createUser(id));
+
+  // remove users who've left
+  document.querySelectorAll('#sketch-holder > div[can-mirror]').forEach((el) => {
+    if (!currentIds.has(el.id)) {
+      el.remove();
+    }
+  });
+});
+
+        });
+
+        document.addEventListener('keydown', (event) => {
+  if (event.key !== 's' && event.key !== 'S') return;
+
+  const el = document.getElementById(playhtml.presence.getMyIdentity().publicKey); 
+  console.log(el.id);
+  if (el.classList.contains('spin-once')) return; // ignore repeat presses mid-spin
+
+  el.classList.add('spin-once');
+});
+
+document.addEventListener('animationend', (event) => {
+  if (event.animationName === 'spin-once') {
+    event.target.classList.remove('spin-once');
+  }
+});
+            
+
+    </script>
+</html>
