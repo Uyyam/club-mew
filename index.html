@@ -29,13 +29,17 @@
     <h1>Welcome to my club :3</h1>
     <h2>click to listen to da musik :P</h2>
 
-    <img src="images/dancingcat1.gif" class="dancing" style="  top:70%;left:10%;">
+ <img src="images/dancingcat1.gif" class="dancing" style="  top:70%;left:10%;">
     <img src="images/dancingcat2.gif" class="dancing" style="top:20%; left: 80%";>
-    <img src="images/dancingcat3.gif" class="dancing" style="top:80%; left:80%">
+    <img src="images/dancingcat3.gif" class="dancing" style="top:60%; left:60%">
     <img src="images/dancingcat4.gif" width="150px" class="dancing" style="top:10%; left:10%">
 
-    <img src="images/coughcat.gif" class="dancing" style="top:-5%; left:60%">
+    <img src="images/coughcat.gif" class="dancing" style="top:70%; left:82%">
     <img src="images/spin.gif" width="150px" class="dancing" style="top:0%; left:30%">
+    <img src="images/bar.png" id="bar" width="250px" style="position:fixed; top:80%; left:80%">
+
+    <p id="cupText">press c to grab a drink</p>
+    
 
     <div id="left-side">
   <div class="light c1"></div>
@@ -169,17 +173,17 @@ function newCapture(p , id) {
       window.playhtml = playhtml;
       
 playhtml.ready.then(() => {
-          //   playhtml.presence
-          //     .getPresences()
-          //     .entries()
-          //     .forEach(([id, p]) => {
-          //   playhtml.presence.getPresences().entries().forEach(([id, p]) =>{
-          //   createUser(id);
-          //   });
+            playhtml.presence
+              .getPresences()
+              .entries()
+              .forEach(([id, p]) => {
+            playhtml.presence.getPresences().entries().forEach(([id, p]) =>{
+            createUser(id);
+            });
             
-          //    console.log(playhtml.presence.getMyIdentity().publicKey);
-          //   console.log(playhtml.presence.getPresences());
-          // })
+             console.log(playhtml.presence.getMyIdentity().publicKey);
+            console.log(playhtml.presence.getPresences());
+          })
           document.addEventListener('mousemove', (event) => {
   // Use clientX and clientY for viewport coordinates
   document.getElementById(playhtml.presence.getMyIdentity().publicKey).style.left = `${event.clientX}px`;
@@ -188,32 +192,53 @@ playhtml.ready.then(() => {
 
 });
 
-playhtml.presence.onPresenceChange("playerIdentity", (presences) => {
-  const currentIds = new Set([...presences.keys()]);
+// playhtml.presence.onPresenceChange("playerIdentity", (presences) => {
+//   const currentIds = new Set([...presences.keys()]);
 
-  // add new users
-  currentIds.forEach((id) => createUser(id));
+//   // add new users
+//   currentIds.forEach((id) => createUser(id));
 
-  // remove users who've left
-  document.querySelectorAll('#sketch-holder > div[can-mirror]').forEach((el) => {
-    if (!currentIds.has(el.id)) {
-      el.remove();
-    }
-  });
-});
+//   // remove users who've left
+//   document.querySelectorAll('#sketch-holder > div[can-mirror]').forEach((el) => {
+//     if (!currentIds.has(el.id)) {
+//       el.remove();
+//     }
+//   });
+// });
 
         });
 
-        document.addEventListener('keydown', (event) => {
-  if (event.key !== 's' && event.key !== 'S') return;
-
-  const el = document.getElementById(playhtml.presence.getMyIdentity().publicKey); 
+         document.addEventListener('keydown', (event) => {
+    const el = document.getElementById(playhtml.presence.getMyIdentity().publicKey); 
+      if ((event.key === 'c' || event.key === 'C') && isHoveringBar) {
+    const newCup = document.createElement("img");
+    newCup.classList.add("cup");
+    newCup.src = "images/cup.png";
+    el.appendChild(newCup);
+  }
+  if (event.key == 's' || event.key == 'S'){
   console.log(el.id);
-  if (el.classList.contains('spin-once')) return; // ignore repeat presses mid-spin
+  if (el.classList.contains('spin-once')) return; 
 
   el.classList.add('spin-once');
+  }
 });
 
+let isHoveringBar = false;
+
+document.addEventListener('mousemove', (event) => {
+  const bar = document.getElementById("bar");
+  const rect = bar.getBoundingClientRect();
+
+  const withinX = event.clientX > rect.left - 100 && event.clientX < rect.right + 100;
+  const withinY = event.clientY > rect.top - 100 && event.clientY < rect.bottom + 100;
+
+  isHoveringBar = withinX && withinY;
+
+  document.getElementById("cupText").style.display = isHoveringBar ? "block" : "none";
+});
+
+        
 document.addEventListener('animationend', (event) => {
   if (event.animationName === 'spin-once') {
     event.target.classList.remove('spin-once');
