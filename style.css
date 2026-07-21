@@ -7,6 +7,9 @@ html, body {
   width:100%;
   height:100%;
   overflow:hidden;
+    color:white;
+  text-align:center;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 /* canvas {
@@ -20,7 +23,7 @@ html, body {
   z-index: 9999;
 }
 
-#sketch-holder * {
+#sketch-holder > div {
   position: fixed;
   /* left: 0;
   top: 0; */
@@ -95,8 +98,18 @@ canvas {
   position:fixed;
 }
 
-h1, h2{
-  color:white;
-  text-align:center;
-  font-family: 'Courier New', Courier, monospace;
+
+#cupText{
+    position:fixed;
+    left:80%;
+    top:70%;
+    display:none;
+}
+
+.cup{
+  position:absolute;
+  width:25px;
+  top:50%;
+  left:50%;
+  transform: translate(50%, 50%);
 }
